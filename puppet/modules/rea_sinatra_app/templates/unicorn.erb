@@ -1,0 +1,19 @@
+@dir = "<%= scope.lookupvar('nginx::params::appdir') %>"
+
+worker_processes 3
+working_directory @dir
+timeout 30
+# Specify path to socket unicorn listens to,
+# we will use this in our nginx.conf later
+
+listen "#{@dir}/sockets/unicorn.sock", :backlog => 64
+
+# Set process id path
+
+pid "#{@dir}/pids/unicorn.pid"
+
+# Set log file paths
+
+stderr_path "#{@dir}/logs/unicorn.stderr.log"
+
+stdout_path "#{@dir}/logs/unicorn.stdout.log"

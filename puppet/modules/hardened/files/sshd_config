@@ -1,0 +1,12 @@
+Port 22
+Protocol 2
+
+SyslogFacility AUTHPRIV
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+GSSAPIAuthentication yes
+GSSAPICleanupCredentials yes
+UsePAM yes
+X11Forwarding yes
+Banner /etc/motd

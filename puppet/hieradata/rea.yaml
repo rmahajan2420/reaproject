@@ -1,0 +1,10 @@
+---
+classes:
+  - hardened 
+  - rea_sinatra_app
+nginx:
+  owner  : 'nginx'
+  group  :  'web'
+  appdir : '/var/www/simple-sinatra-app'
+  sockets : '/var/www/simple-sinatra-app/sockets'
+  hostname  : 'sinatra-app'

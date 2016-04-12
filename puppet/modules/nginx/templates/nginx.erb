@@ -1,0 +1,112 @@
+user <%= scope.lookupvar('nginx::params::owner') %>  <%= scope.lookupvar('nginx::params::group') %> ;
+
+
+worker_processes  3;
+
+error_log  /var/log/nginx/error.log;
+
+pid        /var/run/nginx.pid;
+
+
+
+events {
+
+  worker_connections  1024;
+
+  accept_mutex on;
+
+}
+
+
+
+http {
+
+include       /etc/nginx/mime.types;
+
+
+
+default_type application/octet-stream;
+
+access_log /var/log/nginx/access.log combined;
+
+
+
+# use the kernel sendfile
+
+sendfile        on;
+
+# prepend http headers before sendfile()
+
+tcp_nopush     on;
+
+keepalive_timeout  5;
+
+tcp_nodelay        on;
+
+
+
+gzip  on;
+
+gzip_vary on;
+
+gzip_min_length 500;
+
+
+
+gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+gzip_types text/plain text/xml text/css
+
+   text/comma-separated-values
+
+   text/javascript application/x-javascript
+
+   application/atom+xml image/x-icon;
+
+
+
+upstream unicorn_server {
+
+  server unix:<%= scope.lookupvar('nginx::params::sockets') %>/unicorn.sock
+
+      fail_timeout=0;
+
+}
+
+
+
+server {
+
+  server_name <%= scope.lookupvar('nginx::params::hostname') %> ;
+
+  root <%= scope.lookupvar('nginx::params::appdir') %> ;
+
+  listen 80;
+
+  keepalive_timeout 5;
+
+
+
+  location / {
+
+    try_files $uri @app;
+
+  }
+
+
+
+  location @app {
+
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    proxy_set_header Host $http_host;
+
+    proxy_redirect off;
+
+    proxy_pass http://unicorn_server;
+
+  }
+
+}
+
+}
